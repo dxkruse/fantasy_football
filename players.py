@@ -5,15 +5,18 @@ import json
 def get_player_info():
     players = Players()
     players_info = players.get_all_players()
-    return players_info    
+    new = {x: y for x, y in players_info.items() if 'status' not in y or y['status'] != 'Inactive'}
+    return new
 
 def get_player_ids():
     players = Players()
     players_info = players.get_all_players()
     player_ids = {}
+    
     for i in players_info.keys():
-        player_name = players_info[i]['first_name'] + ' ' + players_info[i]['last_name']
-        player_ids[i] = player_name
+        if 'status' in players_info[i] and players_info[i]['status'] != 'Inactive':
+            player_name = players_info[i]['first_name'] + ' ' + players_info[i]['last_name']
+            player_ids[i] = player_name
     return player_ids
 
 def save_to_json(data):
@@ -26,8 +29,11 @@ def load_from_json(filename):
         data = json.load(f)
     return data
 
+player_ids = get_player_ids()
+save_to_json(player_ids)
 
-
+# players_info = get_player_info()
+# save_to_json(players_info)
 
 
 

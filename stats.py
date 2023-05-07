@@ -42,66 +42,57 @@ def get_all_reg_stats(start=str, end=str):
         
 def sort_by_player_id(filename=str):
     stats = load_from_json(filename)
-    # print(stats.keys())
     with open(f'data/player_ids.json', 'r') as f:
         player_ids = json.load(f)
-    # print(player_ids.keys())
-    # print(sorted_stats)
-    # print(sorted_stats)
-    # sorted_stats = sorted(stats.values(), key=lambda x: int(x.keys()[0]))
-    # for id in player_ids.keys():
-        # print(id)
-        
-    # Create a new dictionary with the merged data
-    # merged_data = {}
-    # for year, players in stats.items():
-    #     for player_id, player_stats in players.items():
-    #         if player_id not in merged_data:
-    #             merged_data[player_id] = {}
-    #         if year not in merged_data[player_id]:
-    #             merged_data[player_id][year] = player_stats
-                
+              
     # Create a new dictionary with the merged data
     merged_data = {}
     for year, players in stats.items():
         for player_id, player_stats in players.items():
-            # print(player_ids.get(player_id))
-            player_name = player_ids.get(player_id)
-            if player_name not in merged_data:
-                merged_data[player_name] = {}
-            if player_id not in merged_data[player_name]:
-                merged_data[player_name][player_id] = {}
-            if year not in merged_data[player_name][player_id]:
-                merged_data[player_name][player_id][year] = player_stats
-
+            if player_id not in merged_data:
+                merged_data[player_id] = {}
+            if year not in merged_data[player_id]:
+                merged_data[player_id][year] = player_stats
+                
+    # Sort the data by player_id and year
     sorted_data = {}
-    for player_name, player_ids in merged_data.items():
-        sorted_player_ids = dict(sorted(player_ids.items(), key=lambda x: x[0]))
-        sorted_data[player_name] = sorted_player_ids
-        for player_id, years in sorted_player_ids.items():
-            sorted_years = dict(sorted(years.items(), key=lambda x: x[0]))
-            sorted_data[player_name][player_id] = sorted_years
-    # sorted_data = {}
-    # for player_id, years in merged_data.items():
-    #     sorted_years = dict(sorted(years.items(), key=lambda x: x[0]))
-    #     sorted_data[player_id] = sorted_years
-    # sorted_data = dict(sorted(sorted_data.items(), key=lambda x: x[0]))
+    for player_id, years in merged_data.items():
+        sorted_years = dict(sorted(years.items(), key=lambda x: x[0]))
+        sorted_data[player_id] = sorted_years
+    sorted_data = dict(sorted(sorted_data.items(), key=lambda x: x[0]))
     
-    # final_data = {}
-    # for player_id, years in sorted_data.items():
-    #     final_data[player_id] = {}
-    #     for year, player_stats in years.items():
-    #         final_data[player_id][year] = player_stats            
+    final_data = {}
+    for player_id, years in sorted_data.items():
+        final_data[player_id] = {}
+        for year, player_stats in years.items():
+            final_data[player_id][year] = player_stats            
 
     save_stats_to_json(sorted_data, 'sorted_stats')
 
-def save_all_post_stats(start=str, end=str):
-    for season in range(start, end):
-        stats = get_season_stats('post', season)            
-        save_stats_to_json(stats)
-        print(f'Saved {season[0]}-{season[-1]} post season stats to JSON file')
+def parse_pos_ids(filename=str, pos=['QB', 'RB', 'WR', 'TE']):
+    pos_info_json = load_from_json(filename)
+    pos_info = { x: y for x, y in pos_info_json.items()
+                if 'position' in y 
+                and y['position'] == pos
+                }
+    save_stats_to_json(pos_info, f'{pos}_info')
+    return pos_info
+    
+def parse_pos_stats(filename=str):
+    pos_stats = load_from_json(filename)
+    new_data = { x: y for x, y in pos_stats.items()
+                if 'position' in y 
+                and y['position'] == pos
+                }
+    save_stats_to_json(new_data, f'{pos}_stats')
+    
+    
         
-# save_all_reg_stats(2018, 2022)
-sort_by_player_id('data/2018_2022_regular.json')
-#get_all_reg_stats(2019, 2020)
+#save_all_reg_stats(2009, 2022)
+#sort_by_player_id('data/2009_2022_regular.json')
+# get_all_reg_stats(2019, 2020)
+# earliest_season = get_season_stats('regular', '2009')
+# save_stats_to_json(earliest_season, 'earliest_season')
+parse_pos_ids('data/players_info.json', 'QB')
+
 
