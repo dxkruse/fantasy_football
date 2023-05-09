@@ -8,9 +8,10 @@ def get_player_info():
     new = {x: y for x, y in players_info.items() if 'status' not in y or y['status'] != 'Inactive'}
     return new
 
-def get_player_ids():
-    players = Players()
-    players_info = players.get_all_players()
+def get_player_ids(filename=str):
+    players_info = load_from_json(filename)
+    # players = Players()
+    # players_info = players.get_all_players()
     player_ids = {}
     
     for i in players_info.keys():
@@ -29,11 +30,6 @@ def load_from_json(filename):
         data = json.load(f)
     return data
 
-player_ids = get_player_ids()
-save_to_json(player_ids)
-
-# players_info = get_player_info()
-# save_to_json(players_info)
 
 
 
